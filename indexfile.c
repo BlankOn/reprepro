@@ -148,14 +148,15 @@ static retvalue indexfile_get(struct indexfile *f) {
 		f->ofs = (d - f->buffer);
 		f->content = 0;
 
+		/* COMMENTED TO ALLOW MERGE.BOOKWORM SYNC
+		 * Adding code to enlarge the buffer in this case
+		 * is risky as hard to test properly.
+		 *
+		 * Also it is almost certainly caused by some
+		 * mis-representation of the file or perhaps
+		 * some attack. Requesting all existing memory in
+		 * those cases does not sound very useful. 
 		if (f->size - f->ofs <= 2048) {
-			/* Adding code to enlarge the buffer in this case
-			 * is risky as hard to test properly.
-			 *
-			 * Also it is almost certainly caused by some
-			 * mis-representation of the file or perhaps
-			 * some attack. Requesting all existing memory in
-			 * those cases does not sound very useful. */
 
 			fprintf(stderr,
 "Error parsing %s line %d: Ridiculous long (>= 256K) control chunk!\n",
@@ -164,6 +165,7 @@ static retvalue indexfile_get(struct indexfile *f) {
 			f->failed = true;
 			return RET_ERROR;
 		}
+		 * */
 
 		bytes_read = uncompress_read(f->f, d, f->size - f->ofs);
 		if (bytes_read < 0)
